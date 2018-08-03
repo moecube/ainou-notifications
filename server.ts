@@ -26,7 +26,7 @@ app.post("/travis", async function(req, res) {
 
   // parse
   const data: Travis = JSON.parse(payload);
-  console.log(payload, data);
+  const repository_name = data.repository.name;
   const repository_slug = `${data.repository.owner_name}/${data.repository.name}`;
   const build_number = data.number;
   const branch = data.branch;
@@ -35,22 +35,22 @@ app.post("/travis", async function(req, res) {
   const message = data.message;
   const compare_url = data.compare_url;
   const build_url = data.build_url;
-
-  const body = `${repository_slug}#${build_number} (${branch} - ${commit} : ${author}): ${message}
-Change view : ${compare_url}
-Build details : ${build_url}`;
+  const result = data.result_message;
+  const body = `${result}: ${repository_name}#${build_number} (${branch} - ${commit} : ${author}): ${message}
+查看变更 : ${compare_url}
+构建详情 : ${build_url}`;
 
   // send
-  const result = await axios(`https://openhook.ainou.asia/ainou/${hookId}/${authToken}`, {
+  const response = await axios(`https://openhook.ainou.asia/ainou/${hookId}/${authToken}`, {
     method: "POST", data: {
       message: { type: "alternative", text: { body } },
       recipient: { protocol, session, user, port, user_name }
     }
   });
 
-  res.header(result.headers);
-  res.status(result.status);
-  res.send(result.data);
+  res.header(response.headers);
+  res.status(response.status);
+  res.send(response.data);
 });
 
 app.listen(80);
