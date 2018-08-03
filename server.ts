@@ -1,24 +1,25 @@
-import express from "express";
-import axios from "axios";
-import bodyParser from "body-parser";
-import crypto from "crypto";
+import express from 'express';
+import axios from 'axios';
+import bodyParser from 'body-parser';
+import crypto from 'crypto';
 
 const { hookId, authToken, protocol, session, user, port, channel, user_name } = process.env;
-const travisPublicKeyRequest = axios("https://api.travis-ci.org/config").then(response => response.data.config.notifications.webhook.public_key);
+const travisPublicKeyRequest = axios('https://api.travis-ci.org/config').then(
+  response => response.data.config.notifications.webhook.public_key
+);
 
 const app = express();
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-app.post("/travis", async function(req, res) {
-
+app.post('/travis', async function(req, res) {
   // verify
   if (!req.headers.signature) {
     return res.status(400).end();
   }
-  const travisSignature = Buffer.from(<string>req.headers.signature, "base64");
+  const travisSignature = Buffer.from(<string>req.headers.signature, 'base64');
   const payload = req.body.payload;
-  const verifier = crypto.createVerify("sha1");
+  const verifier = crypto.createVerify('sha1');
   verifier.update(payload);
   if (!verifier.verify(await travisPublicKeyRequest, travisSignature)) {
     return res.status(403).end();
@@ -42,8 +43,9 @@ app.post("/travis", async function(req, res) {
 
   // send
   const response = await axios(`https://openhook.ainou.asia/ainou/${hookId}/${authToken}`, {
-    method: "POST", data: {
-      message: { type: "alternative", text: { body } },
+    method: 'POST',
+    data: {
+      message: { type: 'alternative', text: { body } },
       recipient: { protocol, session, user, port, channel, user_name }
     }
   });
