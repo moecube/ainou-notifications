@@ -36,7 +36,7 @@ app.post("/travis", async function(req, res) {
   const compare_url = data.compare_url;
   const build_url = data.build_url;
   const result = data.result_message;
-  const body = `${result}: ${repository_name}#${build_number} (${branch} - ${commit} : ${author}): ${message}
+  const body = `${result}: ${repository_name}#${build_number} (${branch} : ${author}): ${message}
 查看变更 : ${compare_url}
 构建详情 : ${build_url}`;
 
