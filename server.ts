@@ -3,7 +3,7 @@ import axios from "axios";
 import bodyParser from "body-parser";
 import crypto from "crypto";
 
-const { hookId, authToken, protocol, session, user, port, user_name } = process.env;
+const { hookId, authToken, protocol, session, user, port, channel, user_name } = process.env;
 const travisPublicKeyRequest = axios("https://api.travis-ci.org/config").then(response => response.data.config.notifications.webhook.public_key);
 
 const app = express();
@@ -44,7 +44,7 @@ app.post("/travis", async function(req, res) {
   const response = await axios(`https://openhook.ainou.asia/ainou/${hookId}/${authToken}`, {
     method: "POST", data: {
       message: { type: "alternative", text: { body } },
-      recipient: { protocol, session, user, port, user_name }
+      recipient: { protocol, session, user, port, channel, user_name }
     }
   });
 
