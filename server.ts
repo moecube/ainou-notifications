@@ -13,6 +13,9 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.post("/travis", async function(req, res) {
 
   // verify
+  if (!req.headers.signature) {
+    return res.status(400).end();
+  }
   const travisSignature = Buffer.from(<string>req.headers.signature, "base64");
   const payload = req.body.payload;
   const verifier = crypto.createVerify("sha1");
